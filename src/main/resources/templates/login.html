@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        .alert {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .social-login {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .google-btn {
+            display: inline-block;
+            background-color: #4285F4;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+        .google-btn:hover {
+            background-color: #357ae8;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+        .divider span {
+            padding: 0 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<h1>Login</h1>
+
+<div id="alert" class="alert"></div>
+
+<form id="loginForm" action="/login" method="post">
+    <div class="form-group">
+        <label for="username">Email</label>
+        <input type="email" id="username" name="username" >
+        <div id="emailError" class="error">Please enter a valid email address</div>
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" >
+        <div id="passwordError" class="error">Password cannot be empty</div>
+    </div>
+
+    <button type="submit">Login</button>
+
+    <p>Don't have an account? <a href="/register">Register</a></p>
+    <a href="/">Back to Home</a>
+</form>
+
+<div class="divider">
+    <span>OR</span>
+</div>
+
+<div class="social-login">
+    <p>Login with your social account</p>
+    <a href="/oauth2/authorization/google" class="google-btn">Login with Google</a>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const emailError = document.getElementById('emailError');
+        const passwordError = document.getElementById('passwordError');
+        const alertBox = document.getElementById('alert');
+
+        // Email validation
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Real-time validation
+        usernameInput.addEventListener('input', function() {
+            if (!isValidEmail(usernameInput.value)) {
+                emailError.style.display = 'block';
+            } else {
+                emailError.style.display = 'none';
+            }
+        });
+
+        passwordInput.addEventListener('input', function() {
+            if (passwordInput.value.length === 0) {
+                passwordError.style.display = 'block';
+            } else {
+                passwordError.style.display = 'none';
+            }
+        });
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            // Validate inputs before submitting
+            let isValid = true;
+
+            if (!isValidEmail(usernameInput.value)) {
+                emailError.style.display = 'block';
+                isValid = false;
+                e.preventDefault();
+            }
+
+            if (passwordInput.value.length === 0) {
+                passwordError.style.display = 'block';
+                isValid = false;
+                e.preventDefault();
+            }
+
+            if (!isValid) {
+                return false;
+            }
+        });
+
+        // Check for URL parameters to display appropriate alerts
+        const urlParams = new URLSearchParams(window.location.search);
+
+        if (urlParams.has('registered') && urlParams.get('registered') === 'success') {
+            alertBox.textContent = 'Registration successful! Please login with your credentials.';
+            alertBox.className = 'alert alert-success';
+            alertBox.style.display = 'block';
+        }
+
+        if (urlParams.has('error')) {
+            alertBox.textContent = 'Invalid username or password. Please try again.';
+            alertBox.className = 'alert alert-danger';
+            alertBox.style.display = 'block';
+        }
+
+        if (urlParams.has('logout')) {
+            alertBox.textContent = 'You have been successfully logged out.';
+            alertBox.className = 'alert alert-success';
+            alertBox.style.display = 'block';
+        }
+    });
+</script>
+</body>
+</html>

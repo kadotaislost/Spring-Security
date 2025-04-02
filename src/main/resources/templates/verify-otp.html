@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<h1>Verify OTP</h1>
+
+<form id="otpForm" th:action="@{/api/otp/verify}" method="post">
+    <div class="form-group">
+        <label for="otp">Enter OTP</label>
+        <input type="text" id="otp" name="otp" required>
+        <div id="otpError" class="error">Invalid OTP</div>
+    </div>
+    <button type="submit">Verify</button>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('otpForm');
+        const otpInput = document.getElementById('otp');
+        const otpError = document.getElementById('otpError');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const otp = otpInput.value;
+
+            fetch('/api/otp/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    otp: otp
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 200) {
+                        window.location.href = '/welcome';
+                    } else {
+                        otpError.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    otpError.style.display = 'block';
+                    console.error('Error:', error);
+                });
+        });
+    });
+</script>
+</body>
+</html>
