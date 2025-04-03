@@ -62,7 +62,7 @@ public class SecurityConfig {
                         .userInfoEndpoint()
                         .userService(customOAuth2UserService)
                         .and()
-                        .successHandler(customAuthenticationSuccessHandler))
+                        .defaultSuccessUrl("/welcome", true))
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")

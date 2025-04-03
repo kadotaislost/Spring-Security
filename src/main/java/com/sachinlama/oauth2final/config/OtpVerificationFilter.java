@@ -2,6 +2,7 @@ package com.sachinlama.oauth2final.config;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -28,6 +29,12 @@ public class OtpVerificationFilter extends OncePerRequestFilter {
 
         HttpSession session = request.getSession(false);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // If user is authenticated via OAuth2 (Google login), bypass OTP check
+        if (auth instanceof OAuth2AuthenticationToken) {
+            chain.doFilter(request, response);
+            return;
+        }
 
         // Check if user is authenticated but OTP verification is pending
         if (session != null && session.getAttribute("PENDING_AUTHENTICATION") != null) {
